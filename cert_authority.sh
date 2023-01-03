@@ -121,7 +121,7 @@ create_ca() {
 
     echo "Generating self-signed root certificate..."
     echo
-    openssl req -config "$CONFIG_FILE" -new -x509 -extensions ca_extensions -days 5000 -keyout "$private_key" -out "$cert_pem"
+    openssl req -config "$CONFIG_FILE" -new -x509 -extensions ca_extensions -days 365 -keyout "$private_key" -out "$cert_pem"
     if [ ! -e "$private_key" ]; then
       echo "Error occurred generating private key $private_key!" >&2
       exit 1
@@ -269,6 +269,7 @@ select_cert_template() {
 # $1 - certificate template to request
 prompt_csr_subject() {
 
+  echo $CSR_SUBJECT_ALT_NAME
   echo "Generating CSR with Certificate Template: $template_extension"
   echo
 
@@ -279,7 +280,7 @@ prompt_csr_subject() {
       CSR_COMMON_NAME="$simple_name"
       CSR_EMAIL=""
       CSR_USER_PRINCIPAL_NAME=""
-      CSR_SUBJECT_ALT_NAME=""
+      CSR_SUBJECT_ALT_NAME="$CSR_SUBJECT_ALT_NAME"
       ;;
     client_auth_email_extensions)
       echo "Enter the [Email Address] for the client certificate: "
@@ -287,7 +288,7 @@ prompt_csr_subject() {
       CSR_COMMON_NAME="$email"
       CSR_EMAIL="$email"
       CSR_USER_PRINCIPAL_NAME=""
-      CSR_SUBJECT_ALT_NAME=""
+      CSR_SUBJECT_ALT_NAME="$CSR_SUBJECT_ALT_NAME"
       ;;
     client_auth_smartcard_extensions)
       echo "Enter the [User Principal Name] for the client certificate: "
@@ -295,7 +296,7 @@ prompt_csr_subject() {
       CSR_COMMON_NAME="$upn"
       CSR_EMAIL=""
       CSR_USER_PRINCIPAL_NAME="$upn"
-      CSR_SUBJECT_ALT_NAME=""
+      CSR_SUBJECT_ALT_NAME="$CSR_SUBJECT_ALT_NAME"
       ;;
     client_auth_all_extensions)
       echo "Enter the [Simple Name] for the client certificate subject: "
@@ -307,7 +308,7 @@ prompt_csr_subject() {
       CSR_COMMON_NAME="$simple_name"
       CSR_EMAIL="$email"
       CSR_USER_PRINCIPAL_NAME="$upn"
-      CSR_SUBJECT_ALT_NAME=""
+      CSR_SUBJECT_ALT_NAME="$CSR_SUBJECT_ALT_NAME"
       ;;
     server_auth_extensions)
       echo "Enter the [Simple Name] for the server certificate subject: "
@@ -315,7 +316,7 @@ prompt_csr_subject() {
       CSR_COMMON_NAME="$simple_name"
       CSR_EMAIL=""
       CSR_USER_PRINCIPAL_NAME=""
-      CSR_SUBJECT_ALT_NAME=""
+      CSR_SUBJECT_ALT_NAME="$CSR_SUBJECT_ALT_NAME"
       ;;
     server_auth_san_extensions)
       echo "Enter the [Simple Name] for the server certificate subject: "
@@ -323,7 +324,7 @@ prompt_csr_subject() {
       CSR_COMMON_NAME="$simple_name"
       CSR_SUBJECT_ALT_NAME=""
       CSR_EMAIL=""
-      CSR_USER_PRINCIPAL_NAME=""
+      CSR_USER_PRINCIPAL_NAME="$CSR_SUBJECT_ALT_NAME"
 
       while read -e -p "Enter a [DNS Subject Alternative Name] for the server certificate: "  dns && [ "$dns" != "" ]; do
         if [[ "$CSR_SUBJECT_ALT_NAME" != *"$dns"* ]]; then
